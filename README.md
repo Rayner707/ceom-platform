@@ -41,27 +41,34 @@ Panel administrativo desarrollado para la plataforma **CEOM**, orientado a la ge
 ```bash
 git clone https://github.com/tu-usuario/ceom-panel.git
 cd ceom-panel
+```
 
-	2.	Instala las dependencias:
+2. Instala las dependencias:
 
+```bash
 npm install
+```
 
-	3.	Configura Firebase:
+3. Configura Firebase:
 
-Crea un archivo .env.local con tus credenciales de Firebase:
+Crea un archivo `.env.local` con tus credenciales de Firebase:
 
+```env
 NEXT_PUBLIC_FIREBASE_API_KEY=...
 NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=...
 NEXT_PUBLIC_FIREBASE_PROJECT_ID=...
 NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=...
 NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=...
 NEXT_PUBLIC_FIREBASE_APP_ID=...
+```
 
-	4.	Inicia el servidor de desarrollo:
+4. Inicia el servidor de desarrollo:
 
+```bash
 npm run dev
+```
 
-Accede a http://localhost:3000
+Accede a [http://localhost:3000](http://localhost:3000)
 
 ⸻
 
