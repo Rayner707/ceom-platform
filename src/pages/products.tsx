@@ -14,6 +14,7 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import Link from "next/link";
 
 interface Product {
   id: string;
@@ -180,6 +181,13 @@ export default function ProductsPage() {
                 <button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 w-full">
                   Crear producto
                 </button>
+
+                <Link
+                  href="/pricing"
+                  className="text-sm text-blue-600 hover:underline block mt-2"
+                >
+                  ¿No sabes qué precio poner? Calcula tu precio aquí →
+                </Link>
               </form>
 
               {products.length > 0 && (
