@@ -1,5 +1,13 @@
 import { useEffect, useState } from "react";
-import { collection, addDoc, getDocs, query, where } from "firebase/firestore";
+import {
+  collection,
+  addDoc,
+  getDocs,
+  query,
+  where,
+  doc,
+  updateDoc,
+} from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import Layout from "@/components/common/Layout";
 import { useUser } from "@/context/UserContext";
@@ -16,7 +24,7 @@ export default function CreateBusinessPage() {
   const [selectedUserId, setSelectedUserId] = useState("");
   const [name, setName] = useState("");
   const [location, setLocation] = useState("");
-  const [sector, setSector] = useState("");
+  const [category, setCategory] = useState(""); // cambiamos sector por category
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -44,18 +52,20 @@ export default function CreateBusinessPage() {
     setLoading(true);
 
     try {
-      await addDoc(collection(db, "businesses"), {
+      const businessRef = await addDoc(collection(db, "businesses"), {
         name,
         ownerId: selectedUserId,
         location,
-        sector,
+        category,
         createdAt: new Date(),
       });
 
+      // Resetear formularios
       setName("");
       setLocation("");
-      setSector("");
+      setCategory("");
       setSelectedUserId("");
+
       alert("Negocio creado exitosamente.");
     } catch (err: any) {
       console.error(err);
@@ -102,13 +112,17 @@ export default function CreateBusinessPage() {
             className="w-full border rounded p-2"
           />
 
-          <input
-            type="text"
-            placeholder="Sector"
-            value={sector}
-            onChange={(e) => setSector(e.target.value)}
+          <select
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
             className="w-full border rounded p-2"
-          />
+            required
+          >
+            <option value="">Seleccione categoría</option>
+            <option value="alimentos">Alimentos</option>
+            <option value="servicios">Servicios</option>
+            <option value="retail">Retail</option>
+          </select>
 
           {error && <p className="text-red-500 text-sm">{error}</p>}
 

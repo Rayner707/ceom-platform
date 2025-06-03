@@ -23,11 +23,6 @@ import {
 } from "firebase/firestore";
 import { format } from "date-fns";
 
-interface Business {
-  id: string;
-  name: string;
-}
-
 interface Product {
   id: string;
   name: string;
@@ -48,48 +43,32 @@ interface FixedCost {
 }
 
 export default function SummaryPage() {
-  const { user, role, loading } = useUser();
-  const [businesses, setBusinesses] = useState<Business[]>([]);
-  const [selectedBusinessId, setSelectedBusinessId] = useState("");
+  const { user, role, loading, activeBusiness } = useUser();
   const [products, setProducts] = useState<Product[]>([]);
   const [productions, setProductions] = useState<Production[]>([]);
   const [costs, setCosts] = useState<FixedCost[]>([]);
   const [selectedWeek, setSelectedWeek] = useState("");
 
   useEffect(() => {
-    if (!user || !role) return;
-
-    const fetchBusinesses = async () => {
-      const q = role === "admin"
-        ? query(collection(db, "businesses"))
-        : query(collection(db, "businesses"), where("ownerId", "==", user.uid));
-      const snap = await getDocs(q);
-      setBusinesses(snap.docs.map(doc => ({ id: doc.id, ...(doc.data() as any) })));
-    };
-
-    fetchBusinesses();
-  }, [user, role]);
-
-  useEffect(() => {
     const fetchData = async () => {
-      if (!selectedBusinessId) return;
+      if (!activeBusiness) return;
 
-      const productQ = query(collection(db, "products"), where("businessId", "==", selectedBusinessId));
+      const productQ = query(collection(db, "products"), where("businessId", "==", activeBusiness.id));
       const productSnap = await getDocs(productQ);
       const productList = productSnap.docs.map(doc => ({ id: doc.id, ...(doc.data() as any) }));
       setProducts(productList);
 
-      const prodQ = query(collection(db, "production"), where("businessId", "==", selectedBusinessId));
+      const prodQ = query(collection(db, "production"), where("businessId", "==", activeBusiness.id));
       const prodSnap = await getDocs(prodQ);
       setProductions(prodSnap.docs.map(doc => doc.data() as Production));
 
-      const costQ = query(collection(db, "fixed_costs"), where("businessId", "==", selectedBusinessId));
+      const costQ = query(collection(db, "fixed_costs"), where("businessId", "==", activeBusiness.id));
       const costSnap = await getDocs(costQ);
       setCosts(costSnap.docs.map(doc => doc.data() as FixedCost));
     };
 
     fetchData();
-  }, [selectedBusinessId]);
+  }, [activeBusiness]);
 
   const groupByWeek = () => {
     const grouped: Record<string, { ingresos: number; costosVar: number; utilidad: number }> = {};
@@ -175,17 +154,17 @@ export default function SummaryPage() {
       {
         label: "Ingresos",
         data: Object.values(resumen).map((r) => r.ingresos),
-        backgroundColor: "rgba(59, 130, 246, 0.6)", // azul
+        backgroundColor: "rgba(59, 130, 246, 0.6)",
       },
       {
         label: "Costos Variables",
         data: Object.values(resumen).map((r) => r.costosVar),
-        backgroundColor: "rgba(234, 179, 8, 0.6)", // amarillo
+        backgroundColor: "rgba(234, 179, 8, 0.6)",
       },
       {
         label: "Utilidad Bruta",
         data: Object.values(resumen).map((r) => r.utilidad),
-        backgroundColor: "rgba(34, 197, 94, 0.6)", // verde
+        backgroundColor: "rgba(34, 197, 94, 0.6)",
       },
     ],
   };
@@ -216,18 +195,7 @@ export default function SummaryPage() {
           </div>
         )}
 
-        <select
-          className="w-full p-2 border rounded"
-          value={selectedBusinessId}
-          onChange={(e) => setSelectedBusinessId(e.target.value)}
-        >
-          <option value="">Selecciona un negocio</option>
-          {businesses.map((b) => (
-            <option key={b.id} value={b.id}>{b.name}</option>
-          ))}
-        </select>
-
-        {selectedBusinessId && (
+        {activeBusiness && (
           <>
             <select
               className="w-full p-2 border rounded"

@@ -2,13 +2,15 @@ import { logoutUser } from "@/lib/auth";
 import Link from "next/link";
 import router, { useRouter } from "next/router";
 import { useUser } from "@/context/UserContext";
+import { sectionsByCategory } from "@/constants/sectionsByCategory";
 
 export default function Sidebar() {
   const { pathname } = useRouter();
-  const { role } = useUser();
+  const { role, activeBusiness, loading } = useUser();
 
   const navItem = (href: string, label: string) => (
     <Link
+      key={href}
       href={href}
       className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
         pathname === href
@@ -20,18 +22,15 @@ export default function Sidebar() {
     </Link>
   );
 
+  const businessCategory = activeBusiness?.category ?? "";
+  const userSections = sectionsByCategory[businessCategory] ?? [];
+
   return (
     <aside className="hidden md:flex flex-col w-60 h-screen bg-gray-900 text-white shadow-lg p-4">
       <h2 className="text-2xl font-bold mb-6 text-white">CEOM</h2>
       <nav className="flex flex-col gap-2">
         {navItem("/dashboard", "Dashboard")}
-        {navItem("/products", "Productos")}
-        {navItem("/production", "Producción")}
-        {navItem("/production-history", "Historial de Producción")}
-        {navItem("/fixed-costs", "Costos Fijos")}
-        {navItem("/break-even", "Punto de Equilibrio")}
-        {navItem("/summary", "Resumen Financiero")}
-        {navItem("/simulation", "Simulación")}
+        {userSections.map((section) => navItem(section.path, section.name))}
 
         {role === "admin" && (
           <>

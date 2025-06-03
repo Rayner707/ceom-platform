@@ -1,37 +1,15 @@
 import Layout from "@/components/common/Layout";
-import { useEffect, useState } from "react";
-import { collection, getDocs, query, where } from "firebase/firestore";
-import { db } from "@/lib/firebase";
 import { useUser } from "@/context/UserContext";
 
-interface Business {
-  id: string;
-  name: string;
-  location?: string;
-  sector?: string;
-  createdAt?: any;
-}
-
 export default function DashboardPage() {
-  const { user, role, loading } = useUser();
-  const [businesses, setBusinesses] = useState<Business[]>([]);
-
-  useEffect(() => {
-    if (role === "emprendedor" && user) {
-      const fetchBusinesses = async () => {
-        const q = query(collection(db, "businesses"), where("ownerId", "==", user.uid));
-        const querySnapshot = await getDocs(q);
-        const list = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        })) as Business[];
-
-        setBusinesses(list);
-      };
-
-      fetchBusinesses();
-    }
-  }, [role, user]);
+  const {
+    user,
+    role,
+    loading,
+    businesses,
+    activeBusiness,
+    setActiveBusiness,
+  } = useUser();
 
   if (loading) return null;
 
@@ -50,27 +28,44 @@ export default function DashboardPage() {
         )}
 
         {role === "emprendedor" && (
-          <div>
+          <div className="text-white">
             <h2 className="text-xl font-semibold mb-2">Tus negocios</h2>
+
             {businesses.length === 0 ? (
               <p className="text-gray-400">Aún no tienes negocios registrados.</p>
             ) : (
-              <ul className="space-y-3">
+              <div className="space-y-4">
                 {businesses.map((biz) => (
-                  <li key={biz.id} className="border border-gray-700 rounded p-4 bg-gray-900">
+                  <div
+                    key={biz.id}
+                    className={`border rounded p-4 cursor-pointer ${
+                      activeBusiness?.id === biz.id
+                        ? "border-blue-500 bg-blue-950"
+                        : "border-gray-700 bg-gray-900 hover:border-blue-500"
+                    }`}
+                    onClick={() => setActiveBusiness(biz)}
+                  >
                     <h3 className="text-lg font-bold">{biz.name}</h3>
                     <p className="text-sm text-gray-400">
                       {biz.location && `📍 ${biz.location}`}{" "}
-                      {biz.sector && ` | 🏷️ ${biz.sector}`}
+                      {biz.category && ` | 🏷️ ${biz.category}`}
                     </p>
                     {biz.createdAt?.toDate && (
                       <p className="text-xs text-gray-500">
                         Creado el: {biz.createdAt.toDate().toLocaleDateString()}
                       </p>
                     )}
-                  </li>
+                  </div>
                 ))}
-              </ul>
+
+                <div className="mt-4 p-4 border border-green-600 rounded bg-green-900 text-white">
+                  <p className="font-semibold">Negocio activo:</p>
+                  <p>
+                    <strong>{activeBusiness?.name}</strong> (
+                    {activeBusiness?.category})
+                  </p>
+                </div>
+              </div>
             )}
           </div>
         )}

@@ -13,11 +13,6 @@ import {
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 
-interface Business {
-  id: string;
-  name: string;
-}
-
 interface Product {
   id: string;
   name: string;
@@ -32,9 +27,7 @@ interface ProductionRecord {
 }
 
 export default function ProductionHistoryPage() {
-  const { user, role, loading } = useUser();
-  const [businesses, setBusinesses] = useState<Business[]>([]);
-  const [selectedBusinessId, setSelectedBusinessId] = useState("");
+  const { user, role, loading, activeBusiness } = useUser();
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [products, setProducts] = useState<Product[]>([]);
@@ -42,54 +35,37 @@ export default function ProductionHistoryPage() {
   const [exporting, setExporting] = useState(false);
 
   useEffect(() => {
-  if (!user || !role) return;
+    if (!activeBusiness) return;
 
-  const fetchBusinesses = async () => {
-    const q = role === "admin"
-      ? query(collection(db, "businesses"))
-      : query(collection(db, "businesses"), where("ownerId", "==", user.uid));
+    const fetchData = async () => {
+      const productQ = query(
+        collection(db, "products"),
+        where("businessId", "==", activeBusiness.id)
+      );
+      const productSnap = await getDocs(productQ);
+      const productList = productSnap.docs.map(doc => ({ id: doc.id, ...(doc.data() as any) }));
+      setProducts(productList);
 
-    const snapshot = await getDocs(q);
-    const list = snapshot.docs.map(doc => ({ id: doc.id, ...(doc.data() as any) }));
-    setBusinesses(list);
-  };
+      const productionQ = query(
+        collection(db, "production"),
+        where("businessId", "==", activeBusiness.id),
+        orderBy("registeredAt", "desc")
+      );
+      const prodSnap = await getDocs(productionQ);
+      const prodList = prodSnap.docs.map(doc => ({ id: doc.id, ...(doc.data() as any) }));
+      setRecords(prodList);
+    };
 
-  fetchBusinesses();
-}, [user, role]);
-
-  useEffect(() => {
-    if (selectedBusinessId) {
-      const fetchData = async () => {
-        const productQ = query(collection(db, "products"), where("businessId", "==", selectedBusinessId));
-        const productSnap = await getDocs(productQ);
-        const productList = productSnap.docs.map(doc => ({ id: doc.id, ...(doc.data() as any) }));
-        setProducts(productList);
-
-        const productionQ = query(
-          collection(db, "production"),
-          where("businessId", "==", selectedBusinessId),
-          orderBy("registeredAt", "desc")
-        );
-        const prodSnap = await getDocs(productionQ);
-        const prodList = prodSnap.docs.map(doc => ({ id: doc.id, ...(doc.data() as any) }));
-        setRecords(prodList);
-      };
-      fetchData();
-    }
-  }, [selectedBusinessId]);
+    fetchData();
+  }, [activeBusiness]);
 
   const getProductName = (productId: string) => {
     const product = products.find(p => p.id === productId);
     return product ? product.name : "Producto desconocido";
   };
 
-  if (loading) return null;
-
-  // --- NUEVAS FUNCIONES: eliminar y editar ---
   const handleDelete = async (id: string) => {
-    const confirmDelete = confirm("¿Seguro que deseas eliminar este registro?");
-    if (!confirmDelete) return;
-
+    if (!confirm("¿Seguro que deseas eliminar este registro?")) return;
     try {
       await deleteDoc(doc(db, "production", id));
       setRecords(records.filter((r) => r.id !== id));
@@ -114,7 +90,6 @@ export default function ProductionHistoryPage() {
       console.error("Error actualizando la cantidad:", err);
     }
   };
-  // --- FIN NUEVAS FUNCIONES ---
 
   const filteredRecords = records.filter((rec) => {
     if (!startDate && !endDate) return true;
@@ -130,9 +105,7 @@ export default function ProductionHistoryPage() {
       getProductName(rec.productId),
       rec.date,
       rec.quantity.toString(),
-      rec.registeredAt?.toDate
-        ? rec.registeredAt.toDate().toLocaleString()
-        : "",
+      rec.registeredAt?.toDate ? rec.registeredAt.toDate().toLocaleString() : "",
     ]);
 
     const csvContent = [headers, ...rows]
@@ -160,9 +133,7 @@ export default function ProductionHistoryPage() {
       getProductName(rec.productId),
       rec.date,
       rec.quantity.toString(),
-      rec.registeredAt?.toDate
-        ? rec.registeredAt.toDate().toLocaleString()
-        : "",
+      rec.registeredAt?.toDate ? rec.registeredAt.toDate().toLocaleString() : "",
     ]);
 
     autoTable(doc, {
@@ -175,63 +146,60 @@ export default function ProductionHistoryPage() {
     setExporting(false);
   };
 
+  if (loading) return null;
+  if (role !== "emprendedor" && role !== "admin")
+    return <p className="p-4 text-red-500">Acceso denegado.</p>;
+
+  if (!activeBusiness) {
+    return (
+      <Layout>
+        <div className="p-4 text-yellow-500">
+          Por favor selecciona un negocio desde el Dashboard para ver el historial.
+        </div>
+      </Layout>
+    );
+  }
+
   return (
     <Layout>
       <div className="max-w-3xl mx-auto space-y-6">
         <h1 className="text-2xl font-bold">Historial de Producción</h1>
 
-        <select
-          className="w-full p-2 border rounded"
-          value={selectedBusinessId}
-          onChange={(e) => setSelectedBusinessId(e.target.value)}
-        >
-          <option value="">Selecciona un negocio</option>
-          {businesses.map((b) => (
-            <option key={b.id} value={b.id}>
-              {b.name}
-            </option>
-          ))}
-        </select>
-
-        {selectedBusinessId && (
-          <div className="flex flex-col md:flex-row gap-4 mt-2">
-            <div className="flex-1">
-              <label className="block text-sm text-white">Desde:</label>
-              <input
-                type="date"
-                className="w-full border rounded p-2"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-              />
-            </div>
-            <div className="flex-1">
-              <label className="block text-sm text-white">Hasta:</label>
-              <input
-                type="date"
-                className="w-full border rounded p-2"
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-              />
-            </div>
+        <div className="flex flex-col md:flex-row gap-4">
+          <div className="flex-1">
+            <label className="block text-sm text-white">Desde:</label>
+            <input
+              type="date"
+              className="w-full border rounded p-2"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+            />
           </div>
-        )}
-
-        {selectedBusinessId && (
-          <div className="flex gap-4 items-center">
-            <button
-              onClick={exportToCSV}
-              className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded text-sm"
-            >
-              Exportar CSV
-            </button>
-            <button
-              onClick={exportToPDF}
-              className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded text-sm"
-            >
-              Exportar PDF
-            </button>
+          <div className="flex-1">
+            <label className="block text-sm text-white">Hasta:</label>
+            <input
+              type="date"
+              className="w-full border rounded p-2"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+            />
           </div>
-        )}
+        </div>
+
+        <div className="flex gap-4 items-center">
+          <button
+            onClick={exportToCSV}
+            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded text-sm"
+          >
+            Exportar CSV
+          </button>
+          <button
+            onClick={exportToPDF}
+            className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded text-sm"
+          >
+            Exportar PDF
+          </button>
+        </div>
 
         {filteredRecords.length > 0 ? (
           <ul className="space-y-2">
@@ -246,7 +214,6 @@ export default function ProductionHistoryPage() {
                     ? rec.registeredAt.toDate().toLocaleString()
                     : "N/A"}
                 </p>
-                {/* Botones de editar y eliminar */}
                 {role === "emprendedor" && (
                   <div className="flex gap-2 mt-3">
                     <button
@@ -267,9 +234,7 @@ export default function ProductionHistoryPage() {
             ))}
           </ul>
         ) : (
-          selectedBusinessId && (
-            <p className="text-gray-400">No hay registros de producción.</p>
-          )
+          <p className="text-gray-400">No hay registros de producción.</p>
         )}
       </div>
     </Layout>

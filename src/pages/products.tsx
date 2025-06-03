@@ -15,11 +15,6 @@ import {
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 
-interface Business {
-  id: string;
-  name: string;
-}
-
 interface Product {
   id: string;
   name: string;
@@ -29,9 +24,13 @@ interface Product {
 }
 
 export default function ProductsPage() {
-  const { user, role, loading } = useUser();
-  const [businesses, setBusinesses] = useState<Business[]>([]);
-  const [selectedBusinessId, setSelectedBusinessId] = useState("");
+  const {
+    user,
+    role,
+    loading,
+    activeBusiness,
+  } = useUser();
+
   const [products, setProducts] = useState<Product[]>([]);
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
@@ -39,41 +38,24 @@ export default function ProductsPage() {
   const [error, setError] = useState("");
   const [editProduct, setEditProduct] = useState<Product | null>(null);
 
-  // Obtener negocios del emprendedor
+  // Obtener productos del negocio activo
   useEffect(() => {
-  if (!user || !role) return;
+    if (!activeBusiness) return;
 
-  const fetchBusinesses = async () => {
-    const q = role === "admin"
-      ? query(collection(db, "businesses"))
-      : query(collection(db, "businesses"), where("ownerId", "==", user.uid));
-
-    const snapshot = await getDocs(q);
-    const list = snapshot.docs.map(doc => ({ id: doc.id, ...(doc.data() as any) }));
-    setBusinesses(list);
-  };
-
-  fetchBusinesses();
-}, [user, role]);
-
-  // Obtener productos del negocio seleccionado
-  useEffect(() => {
-    if (selectedBusinessId) {
-      const fetchProducts = async () => {
-        const q = query(collection(db, "products"), where("businessId", "==", selectedBusinessId));
-        const snapshot = await getDocs(q);
-        const list = snapshot.docs.map(doc => ({ id: doc.id, ...(doc.data() as any) }));
-        setProducts(list);
-      };
-      fetchProducts();
-    }
-  }, [selectedBusinessId]);
+    const fetchProducts = async () => {
+      const q = query(collection(db, "products"), where("businessId", "==", activeBusiness.id));
+      const snapshot = await getDocs(q);
+      const list = snapshot.docs.map(doc => ({ id: doc.id, ...(doc.data() as any) }));
+      setProducts(list);
+    };
+    fetchProducts();
+  }, [activeBusiness]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
-    if (!selectedBusinessId) {
+    if (!activeBusiness) {
       setError("Debes seleccionar un negocio.");
       return;
     }
@@ -83,7 +65,7 @@ export default function ProductsPage() {
         name,
         price: parseFloat(price),
         cost: parseFloat(cost),
-        businessId: selectedBusinessId,
+        businessId: activeBusiness.id,
         ownerId: user?.uid,
         createdAt: new Date(),
       };
@@ -92,9 +74,9 @@ export default function ProductsPage() {
       setName("");
       setPrice("");
       setCost("");
-      // refrescar
+
       const snapshot = await getDocs(
-        query(collection(db, "products"), where("businessId", "==", selectedBusinessId))
+        query(collection(db, "products"), where("businessId", "==", activeBusiness.id))
       );
       const list = snapshot.docs.map(doc => ({ id: doc.id, ...(doc.data() as any) }));
       setProducts(list);
@@ -104,7 +86,6 @@ export default function ProductsPage() {
     }
   };
 
-  // --- Agregado: funciones de eliminar y editar producto ---
   const handleDelete = async (id: string) => {
     if (!confirm("¿Estás seguro de eliminar este producto?")) return;
 
@@ -141,7 +122,6 @@ export default function ProductsPage() {
   };
 
   if (loading) return null;
-  if (loading) return null;
 
   return (
     <>
@@ -156,104 +136,92 @@ export default function ProductsPage() {
         />
       )}
       <Layout>
-      <div className="max-w-3xl mx-auto space-y-6">
-        <h1 className="text-2xl font-bold">Gestión de Productos</h1>
+        <div className="max-w-3xl mx-auto space-y-6">
+          <h1 className="text-2xl font-bold">Gestión de Productos</h1>
 
-        {/* Selector de negocio */}
-        <select
-          className="w-full p-2 border rounded"
-          value={selectedBusinessId}
-          onChange={(e) => setSelectedBusinessId(e.target.value)}
-        >
-          <option value="">Selecciona un negocio</option>
-          {businesses.map((b) => (
-            <option key={b.id} value={b.id}>
-              {b.name}
-            </option>
-          ))}
-        </select>
+          {!activeBusiness ? (
+            <p className="text-gray-400">Selecciona un negocio desde el Dashboard.</p>
+          ) : (
+            <>
+              <form onSubmit={handleSubmit} className="space-y-3 bg-white text-black p-4 rounded shadow">
+                <h2 className="text-lg font-semibold">Crear producto</h2>
+                {error && <p className="text-red-500 text-sm">{error}</p>}
 
-        {/* Formulario de creación */}
-        {selectedBusinessId && role === "emprendedor" && (
-          <form onSubmit={handleSubmit} className="space-y-3 bg-white text-black p-4 rounded shadow">
-            <h2 className="text-lg font-semibold">Crear producto</h2>
-            {error && <p className="text-red-500 text-sm">{error}</p>}
-
-            <input
-              type="text"
-              placeholder="Nombre"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="w-full border p-2 rounded"
-              required
-            />
-            <input
-                type="number"
-                placeholder="Precio de venta"
-                value={price}
-                onChange={(e) => {
+                <input
+                  type="text"
+                  placeholder="Nombre"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="w-full border p-2 rounded"
+                  required
+                />
+                <input
+                  type="number"
+                  placeholder="Precio de venta"
+                  value={price}
+                  onChange={(e) => {
                     const value = e.target.value;
                     if (/^\d*\.?\d*$/.test(value)) setPrice(value);
-                }}
-                className="w-full border p-2 rounded"
-                required
-            />
-            <input
-                type="number"
-                placeholder="Costo variable"
-                value={cost}
-                onChange={(e) => {
+                  }}
+                  className="w-full border p-2 rounded"
+                  required
+                />
+                <input
+                  type="number"
+                  placeholder="Costo variable"
+                  value={cost}
+                  onChange={(e) => {
                     const value = e.target.value;
                     if (/^\d*\.?\d*$/.test(value)) setCost(value);
-                }}
-                className="w-full border p-2 rounded"
-                required
-            />
-            <button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 w-full">
-              Crear producto
-            </button>
-          </form>
-        )}
+                  }}
+                  className="w-full border p-2 rounded"
+                  required
+                />
+                <button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 w-full">
+                  Crear producto
+                </button>
+              </form>
 
-        {/* Lista de productos */}
-        {products.length > 0 && (
-          <div className="space-y-2">
-            <h2 className="text-xl font-semibold">Productos registrados</h2>
-            <ul className="space-y-2">
-              {products.map((prod) => (
-                <li key={prod.id} className="border p-3 rounded bg-gray-900 space-y-1">
-                    <h3 className="font-bold">{prod.name}</h3>
-                    <p className="text-sm text-gray-300">
-                        💲 Precio: {prod.price} | 🧾 Costo: {prod.cost}
-                    </p>
-                    {prod.createdAt?.toDate && (
-                        <p className="text-xs text-gray-500">
-                        Creado el: {prod.createdAt.toDate().toLocaleDateString()}
+              {products.length > 0 && (
+                <div className="space-y-2">
+                  <h2 className="text-xl font-semibold">Productos registrados</h2>
+                  <ul className="space-y-2">
+                    {products.map((prod) => (
+                      <li key={prod.id} className="border p-3 rounded bg-gray-900 space-y-1">
+                        <h3 className="font-bold">{prod.name}</h3>
+                        <p className="text-sm text-gray-300">
+                          💲 Precio: {prod.price} | 🧾 Costo: {prod.cost}
                         </p>
-                    )}
-                    {role === "emprendedor" && (
-                      <div className="flex gap-2 mt-2">
-                        <button
-                          onClick={() => handleEdit(prod)}
-                          className="px-2 py-1 text-sm bg-yellow-600 text-white rounded hover:bg-yellow-700"
-                        >
-                          Editar
-                        </button>
-                        <button
-                          onClick={() => handleDelete(prod.id)}
-                          className="px-2 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-700"
-                        >
-                          Eliminar
-                        </button>
-                      </div>
-                    )}
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-      </div>
-    </Layout>
+                        {prod.createdAt?.toDate && (
+                          <p className="text-xs text-gray-500">
+                            Creado el: {prod.createdAt.toDate().toLocaleDateString()}
+                          </p>
+                        )}
+                        {role === "emprendedor" && (
+                          <div className="flex gap-2 mt-2">
+                            <button
+                              onClick={() => handleEdit(prod)}
+                              className="px-2 py-1 text-sm bg-yellow-600 text-white rounded hover:bg-yellow-700"
+                            >
+                              Editar
+                            </button>
+                            <button
+                              onClick={() => handleDelete(prod.id)}
+                              className="px-2 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-700"
+                            >
+                              Eliminar
+                            </button>
+                          </div>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      </Layout>
     </>
   );
 }

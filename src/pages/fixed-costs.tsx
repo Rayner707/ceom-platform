@@ -14,23 +14,17 @@ import {
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 
-interface Business {
-  id: string;
-  name: string;
-}
-
 interface FixedCost {
   id: string;
   name: string;
   amount: number;
   frequency: string;
   createdAt: Timestamp;
+  category?: string;
 }
 
 export default function FixedCostsPage() {
-  const { user, role, loading } = useUser();
-  const [businesses, setBusinesses] = useState<Business[]>([]);
-  const [selectedBusinessId, setSelectedBusinessId] = useState("");
+  const { user, role, loading, activeBusiness } = useUser();
   const [name, setName] = useState("");
   const [amount, setAmount] = useState("");
   const [error, setError] = useState("");
@@ -38,37 +32,27 @@ export default function FixedCostsPage() {
   const [costs, setCosts] = useState<FixedCost[]>([]);
 
   useEffect(() => {
-  if (!user || !role) return;
-
-  const fetchBusinesses = async () => {
-    const q = role === "admin"
-      ? query(collection(db, "businesses"))
-      : query(collection(db, "businesses"), where("ownerId", "==", user.uid));
-
-    const snapshot = await getDocs(q);
-    const list = snapshot.docs.map(doc => ({ id: doc.id, ...(doc.data() as any) }));
-    setBusinesses(list);
-  };
-
-  fetchBusinesses();
-}, [user, role]);
-
-  useEffect(() => {
     const fetchCosts = async () => {
-      if (!selectedBusinessId) return;
-      const q = query(collection(db, "fixed_costs"), where("businessId", "==", selectedBusinessId));
+      if (!activeBusiness) return;
+      const q = query(
+        collection(db, "fixed_costs"),
+        where("businessId", "==", activeBusiness.id)
+      );
       const snapshot = await getDocs(q);
-      const list = snapshot.docs.map(doc => ({ id: doc.id, ...(doc.data() as any) }));
+      const list = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...(doc.data() as any),
+      }));
       setCosts(list);
     };
     fetchCosts();
-  }, [selectedBusinessId]);
+  }, [activeBusiness]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
-    if (!selectedBusinessId) {
+    if (!activeBusiness) {
       setError("Debes seleccionar un negocio.");
       return;
     }
@@ -78,7 +62,7 @@ export default function FixedCostsPage() {
         name,
         amount: parseFloat(amount),
         frequency: "semanal",
-        businessId: selectedBusinessId,
+        businessId: activeBusiness.id,
         userId: user?.uid,
         category,
         createdAt: Timestamp.now(),
@@ -86,6 +70,7 @@ export default function FixedCostsPage() {
       const docRef = await addDoc(collection(db, "fixed_costs"), newCost);
       setName("");
       setAmount("");
+      setCategory("");
       setCosts([...costs, { id: docRef.id, ...newCost }]);
     } catch (err) {
       console.error(err);
@@ -132,26 +117,26 @@ export default function FixedCostsPage() {
   if (loading) return null;
   const isReadonly = role === "admin";
 
+  if (!activeBusiness) {
+    return (
+      <Layout>
+        <div className="p-4 text-yellow-500">
+          Por favor selecciona un negocio desde el Dashboard para ver los costos fijos.
+        </div>
+      </Layout>
+    );
+  }
+
   return (
     <Layout>
       <div className="max-w-3xl mx-auto space-y-6">
         <h1 className="text-2xl font-bold">Costos Fijos</h1>
 
-        <select
-          className="w-full p-2 border rounded"
-          value={selectedBusinessId}
-          onChange={(e) => setSelectedBusinessId(e.target.value)}
-        >
-          <option value="">Selecciona un negocio</option>
-          {businesses.map((b) => (
-            <option key={b.id} value={b.id}>
-              {b.name}
-            </option>
-          ))}
-        </select>
-
-        {selectedBusinessId && !isReadonly && (
-          <form onSubmit={handleSubmit} className="space-y-3 bg-white text-black p-4 rounded shadow">
+        {!isReadonly && (
+          <form
+            onSubmit={handleSubmit}
+            className="space-y-3 bg-white text-black p-4 rounded shadow"
+          >
             <h2 className="text-lg font-semibold">Agregar Costo Fijo</h2>
             {error && <p className="text-red-500 text-sm">{error}</p>}
 
@@ -168,7 +153,7 @@ export default function FixedCostsPage() {
               value={category}
               onChange={(e) => setCategory(e.target.value)}
               required
-              >
+            >
               <option value="">Selecciona una categoría</option>
               <option value="Alquiler">Alquiler</option>
               <option value="Servicios">Servicios</option>
@@ -195,9 +180,14 @@ export default function FixedCostsPage() {
             <h2 className="text-xl font-semibold">Costos Registrados</h2>
             <ul className="space-y-2">
               {costs.map((cost) => (
-                <li key={cost.id} className="border p-3 rounded bg-gray-900 text-white">
+                <li
+                  key={cost.id}
+                  className="border p-3 rounded bg-gray-900 text-white"
+                >
                   <p className="font-bold">{cost.name}</p>
-                  <p className="text-sm text-gray-300">💰 Monto: {cost.amount} Bs | 📆 Frecuencia: {cost.frequency}</p>
+                  <p className="text-sm text-gray-300">
+                    💰 Monto: {cost.amount} Bs | 📆 Frecuencia: {cost.frequency}
+                  </p>
                   {!isReadonly && (
                     <div className="flex gap-2 mt-2">
                       <button
