@@ -18,6 +18,7 @@ export default function PricingPage() {
   const [totalCost, setTotalCost] = useState<number>(0);
   const [productName, setProductName] = useState("");
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [productQuantity, setProductQuantity] = useState<string>("");
 
   if (loading) return null;
 
@@ -49,9 +50,17 @@ export default function PricingPage() {
       return sum + (isNaN(val) ? 0 : val);
     }, 0);
     const labor = parseFloat(laborPercentage || defaultLaborByCategory[category]?.toString() || "30");
-    const suggested = total + (total * (labor / 100));
+    let unitPrice = total + (total * (labor / 100));
+
+    if (category === "alimentos") {
+      const qty = parseInt(productQuantity);
+      if (!isNaN(qty) && qty > 0) {
+        unitPrice = unitPrice / qty;
+      }
+    }
+
     setTotalCost(total);
-    setSuggestedPrice(suggested);
+    setSuggestedPrice(unitPrice);
     setSaveSuccess(false);
   };
 
@@ -88,6 +97,18 @@ export default function PricingPage() {
             items={costItems}
             setItems={setCostItems}
           />
+
+          {category === "alimentos" && (
+            <label className="block text-sm font-medium">
+              Cantidad de productos resultantes (ej. número de Hamburguesas)
+              <input
+                type="number"
+                value={productQuantity}
+                onChange={(e) => setProductQuantity(e.target.value)}
+                className="block w-full border p-2 mt-1 rounded"
+              />
+            </label>
+          )}
 
           <label className="block text-sm font-medium">
             % de Mano de Obra
