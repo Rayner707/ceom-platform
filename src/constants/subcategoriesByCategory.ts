@@ -1,0 +1,30 @@
+export const subcategoriesByCategory: Record<string, string[]> = {
+  alimentos: [
+    "Hamburguesas",
+    "Pizzas",
+    "Empanadas",
+    "Comida Rápida",
+    "Comida China",
+    "Repostería",
+    "Panadería",
+    "Comida Típica",
+  ],
+  servicios: [
+    "Peluquería",
+    "Mecánica",
+    "Reparaciones",
+    "Asesoría",
+    "Limpieza",
+    "Manicura",
+    "Educación",
+  ],
+  retail: [
+    "Ropa",
+    "Accesorios",
+    "Tecnología",
+    "Librería",
+    "Decoración",
+    "Cosméticos",
+    "Artículos de regalo",
+  ],
+};

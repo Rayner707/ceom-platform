@@ -13,6 +13,7 @@ interface Business {
   id: string;
   name: string;
   category: string;
+  subcategory?: string;
   location?: string;
   createdAt?: any;
 }

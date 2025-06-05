@@ -15,6 +15,7 @@ export default function PricingPage() {
   const [costItems, setCostItems] = useState<CostItem[]>([{ name: "", value: "" }]);
   const [laborPercentage, setLaborPercentage] = useState("30");
   const [suggestedPrice, setSuggestedPrice] = useState<number | null>(null);
+  const [unitCost, setUnitCost] = useState<number>(0);
   const [totalCost, setTotalCost] = useState<number>(0);
   const [productName, setProductName] = useState("");
   const [saveSuccess, setSaveSuccess] = useState(false);
@@ -50,16 +51,20 @@ export default function PricingPage() {
       return sum + (isNaN(val) ? 0 : val);
     }, 0);
     const labor = parseFloat(laborPercentage || defaultLaborByCategory[category]?.toString() || "30");
+
+    let unit = total;
     let unitPrice = total + (total * (labor / 100));
 
     if (category === "alimentos") {
       const qty = parseInt(productQuantity);
       if (!isNaN(qty) && qty > 0) {
-        unitPrice = unitPrice / qty;
+        unit = total / qty;
+        unitPrice = unit + (unit * (labor / 100));
       }
     }
 
     setTotalCost(total);
+    setUnitCost(unit);
     setSuggestedPrice(unitPrice);
     setSaveSuccess(false);
   };
@@ -70,7 +75,7 @@ export default function PricingPage() {
       await addDoc(collection(db, "products"), {
         name: productName,
         price: suggestedPrice,
-        cost: totalCost,
+        cost: unitCost,
         businessId: activeBusiness.id,
         userId: user.uid,
         createdAt: Timestamp.now(),

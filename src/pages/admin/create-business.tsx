@@ -11,6 +11,7 @@ import {
 import { db } from "@/lib/firebase";
 import Layout from "@/components/common/Layout";
 import { useUser } from "@/context/UserContext";
+import { subcategoriesByCategory } from "@/constants/subcategoriesByCategory";
 
 interface Emprendedor {
   id: string;
@@ -24,7 +25,8 @@ export default function CreateBusinessPage() {
   const [selectedUserId, setSelectedUserId] = useState("");
   const [name, setName] = useState("");
   const [location, setLocation] = useState("");
-  const [category, setCategory] = useState(""); // cambiamos sector por category
+  const [category, setCategory] = useState("");
+  const [subcategory, setSubcategory] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -57,6 +59,7 @@ export default function CreateBusinessPage() {
         ownerId: selectedUserId,
         location,
         category,
+        subcategory,
         createdAt: new Date(),
       });
 
@@ -64,6 +67,7 @@ export default function CreateBusinessPage() {
       setName("");
       setLocation("");
       setCategory("");
+      setSubcategory("");
       setSelectedUserId("");
 
       alert("Negocio creado exitosamente.");
@@ -114,7 +118,10 @@ export default function CreateBusinessPage() {
 
           <select
             value={category}
-            onChange={(e) => setCategory(e.target.value)}
+            onChange={(e) => {
+              setCategory(e.target.value);
+              setSubcategory("");
+            }}
             className="w-full border rounded p-2"
             required
           >
@@ -123,6 +130,20 @@ export default function CreateBusinessPage() {
             <option value="servicios">Servicios</option>
             <option value="retail">Retail</option>
           </select>
+
+          {category && (
+            <select
+              value={subcategory}
+              onChange={(e) => setSubcategory(e.target.value)}
+              className="w-full border rounded p-2"
+              required
+            >
+              <option value="">Seleccione subcategoría</option>
+              {(subcategoriesByCategory[category] || []).map((sub) => (
+                <option key={sub} value={sub}>{sub}</option>
+              ))}
+            </select>
+          )}
 
           {error && <p className="text-red-500 text-sm">{error}</p>}
 
