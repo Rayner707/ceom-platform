@@ -32,3 +32,15 @@ html,
 body {
   height: 100%;
 }
+
+.bg-card {
+  background-color: var(--color-background);
+}
+
+.text-primary {
+  color: var(--color-foreground);
+}
+
+.border-default {
+  border-color: #444;
+}

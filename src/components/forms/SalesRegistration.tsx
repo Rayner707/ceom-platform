@@ -138,11 +138,10 @@ export default function SalesRegistration() {
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Sales Registration Form */}
         <Card className="shadow-sm">
-          <CardHeader className="bg-white border-b">
+          <CardHeader className="bg-card border-b border-default">
             <CardTitle className="text-2xl font-semibold text-gray-800">Registrar Venta</CardTitle>
           </CardHeader>
-          <CardContent className="p-6 bg-white">
-            <form onSubmit={handleSubmit} className="space-y-6">
+          <CardContent className="p-6 bg-card">            <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {/* Date Picker */}
                 <div className="space-y-2">
@@ -362,12 +361,11 @@ export default function SalesRegistration() {
 
         {/* Sales History */}
         <Card className="shadow-sm">
-          <CardHeader className="bg-white border-b">
+          <CardHeader className="bg-card border-b border-default">
             <CardTitle className="text-2xl font-semibold text-gray-800">Ventas Registradas</CardTitle>
           </CardHeader>
-          <CardContent className="p-6 bg-white">
-            {/* Filters */}
-            <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+          <CardContent className="p-6 bg-card">            {/* Filters */}
+            <div className="mb-6 p-4 bg-card rounded-lg border border-default">
               <div className="flex items-center gap-2 mb-4">
                 <Filter className="h-4 w-4 text-gray-500" />
                 <span className="text-sm font-medium text-gray-700">Filtros</span>
@@ -426,7 +424,7 @@ export default function SalesRegistration() {
             <div className="rounded-lg border">
               <Table>
                 <TableHeader>
-                  <TableRow className="bg-gray-50">
+                  <TableRow className="bg-card">
                     <TableHead className="font-semibold">Fecha</TableHead>
                     <TableHead className="font-semibold">Producto</TableHead>
                     <TableHead className="font-semibold">Cantidad</TableHead>
