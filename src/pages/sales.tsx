@@ -1,3 +1,5 @@
+"use client";
+
 import Layout from "@/components/common/Layout";
 import SalesRegistration from "@/components/forms/SalesRegistration";
 
