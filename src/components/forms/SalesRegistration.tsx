@@ -134,18 +134,18 @@ export default function SalesRegistration() {
   })
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-background p-6 text-foreground">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Sales Registration Form */}
         <Card className="shadow-sm">
           <CardHeader className="bg-card border-b border-default">
-            <CardTitle className="text-2xl font-semibold text-gray-800">Registrar Venta</CardTitle>
+            <CardTitle className="text-2xl font-semibold text-foreground">Registrar Venta</CardTitle>
           </CardHeader>
           <CardContent className="p-6 bg-card">            <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {/* Date Picker */}
                 <div className="space-y-2">
-                  <Label htmlFor="fecha" className="text-sm font-medium text-gray-700">
+                  <Label htmlFor="fecha" className="text-sm font-medium text-foreground">
                     Fecha de la venta
                   </Label>
                   <div className="relative">
@@ -157,13 +157,13 @@ export default function SalesRegistration() {
                       className="pl-10"
                       required
                     />
-                    <CalendarIcon className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                    <CalendarIcon className="absolute left-3 top-3 h-4 w-4 text-gray-500" />
                   </div>
                 </div>
 
                 {/* Product Select */}
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium text-gray-700">Producto vendido</Label>
+                  <Label className="text-sm font-medium text-foreground">Producto vendido</Label>
                   <Select
                     value={formData.producto}
                     onValueChange={(value: any) => setFormData({ ...formData, producto: value })}
@@ -183,7 +183,7 @@ export default function SalesRegistration() {
 
                 {/* Quantity */}
                 <div className="space-y-2">
-                  <Label htmlFor="cantidad" className="text-sm font-medium text-gray-700">
+                  <Label htmlFor="cantidad" className="text-sm font-medium text-foreground">
                     Cantidad vendida
                   </Label>
                   <Input
@@ -199,7 +199,7 @@ export default function SalesRegistration() {
 
                 {/* Unit Price */}
                 <div className="space-y-2">
-                  <Label htmlFor="precio" className="text-sm font-medium text-gray-700">
+                  <Label htmlFor="precio" className="text-sm font-medium text-foreground">
                     Precio unitario de venta
                   </Label>
                   <Input
@@ -216,7 +216,7 @@ export default function SalesRegistration() {
 
                 {/* Payment Method */}
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium text-gray-700">Método de pago</Label>
+                  <Label className="text-sm font-medium text-foreground">Método de pago</Label>
                   <Select
                     value={formData.metodoPago}
                     onValueChange={(value: any) => setFormData({ ...formData, metodoPago: value })}
@@ -236,7 +236,7 @@ export default function SalesRegistration() {
 
                 {/* Total Display */}
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium text-gray-700">Total</Label>
+                  <Label className="text-sm font-medium text-foreground">Total</Label>
                   <div className="px-3 py-2 bg-gray-50 border rounded-md text-lg font-semibold text-green-600">
                     $
                     {formData.cantidad && formData.precioUnitario
@@ -250,7 +250,7 @@ export default function SalesRegistration() {
               <div className="border-t pt-6">
                 <div className="flex items-center space-x-3 mb-4">
                   <Switch id="event-sale" checked={isEventSale} onCheckedChange={setIsEventSale} />
-                  <Label htmlFor="event-sale" className="text-sm font-medium text-gray-700">
+                  <Label htmlFor="event-sale" className="text-sm font-medium text-foreground">
                     ¿Esta venta pertenece a un evento?
                   </Label>
                 </div>
@@ -259,7 +259,7 @@ export default function SalesRegistration() {
                   <div className="bg-blue-50 p-4 rounded-lg space-y-4">
                     <div className="flex gap-4">
                       <div className="flex-1">
-                        <Label className="text-sm font-medium text-gray-700">Seleccionar evento existente</Label>
+                        <Label className="text-sm font-medium text-foreground">Seleccionar evento existente</Label>
                         <Select
                           value={formData.evento}
                           onValueChange={(value: any) => setFormData({ ...formData, evento: value })}
@@ -362,17 +362,17 @@ export default function SalesRegistration() {
         {/* Sales History */}
         <Card className="shadow-sm">
           <CardHeader className="bg-card border-b border-default">
-            <CardTitle className="text-2xl font-semibold text-gray-800">Ventas Registradas</CardTitle>
+            <CardTitle className="text-2xl font-semibold text-foreground">Ventas Registradas</CardTitle>
           </CardHeader>
           <CardContent className="p-6 bg-card">            {/* Filters */}
             <div className="mb-6 p-4 bg-card rounded-lg border border-default">
               <div className="flex items-center gap-2 mb-4">
                 <Filter className="h-4 w-4 text-gray-500" />
-                <span className="text-sm font-medium text-gray-700">Filtros</span>
+                <span className="text-sm font-medium text-foreground">Filtros</span>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div>
-                  <Label className="text-xs text-gray-600">Fecha desde</Label>
+                  <Label className="text-xs text-gray-300">Fecha desde</Label>
                   <Input
                     type="date"
                     value={filters.dateFrom}
@@ -381,7 +381,7 @@ export default function SalesRegistration() {
                   />
                 </div>
                 <div>
-                  <Label className="text-xs text-gray-600">Fecha hasta</Label>
+                  <Label className="text-xs text-gray-300">Fecha hasta</Label>
                   <Input
                     type="date"
                     value={filters.dateTo}
@@ -390,7 +390,7 @@ export default function SalesRegistration() {
                   />
                 </div>
                 <div>
-                  <Label className="text-xs text-gray-600">Producto</Label>
+                  <Label className="text-xs text-gray-300">Producto</Label>
                   <Input
                     placeholder="Buscar producto..."
                     value={filters.product}
@@ -399,7 +399,7 @@ export default function SalesRegistration() {
                   />
                 </div>
                 <div>
-                  <Label className="text-xs text-gray-600">Método de pago</Label>
+                  <Label className="text-xs text-gray-300">Método de pago</Label>
                   <Select
                     value={filters.paymentMethod}
                     onValueChange={(value: any) => setFilters({ ...filters, paymentMethod: value })}
@@ -451,7 +451,7 @@ export default function SalesRegistration() {
                             {sale.evento}
                           </Badge>
                         ) : (
-                          <span className="text-gray-400 text-sm">-</span>
+                          <span className="text-gray-500 text-sm">-</span>
                         )}
                       </TableCell>
                     </TableRow>
