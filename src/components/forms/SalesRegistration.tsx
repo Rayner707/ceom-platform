@@ -2,7 +2,6 @@
 
 import type React from "react"
 
-import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -13,6 +12,10 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
 import { CalendarIcon, Plus, Filter } from "lucide-react"
+import { useEffect, useState } from "react"
+import { useUser } from "@/context/UserContext"
+import { db } from "@/lib/firebase"
+import { collection, getDocs, query, where } from "firebase/firestore"
 
 // Sample data
 const sampleSales = [
@@ -60,6 +63,20 @@ const sampleProducts = [
 const sampleEvents = ["Feria Tecnológica 2024", "Expo Gaming", "Black Friday Sale", "Conferencia Tech"]
 
 const paymentMethods = ["Efectivo", "QR", "Transferencia", "Tarjeta"]
+
+const { activeBusiness } = useUser()
+const [productOptions, setProductOptions] = useState<string[]>([])
+
+useEffect(() => {
+  const fetchProducts = async () => {
+    if (!activeBusiness?.id) return
+    const q = query(collection(db, "products"), where("businessId", "==", activeBusiness.id))
+    const snapshot = await getDocs(q)
+    const products = snapshot.docs.map(doc => doc.data()?.name).filter(Boolean) as string[]
+    setProductOptions(products)
+  }
+  fetchProducts()
+}, [activeBusiness])
 
 export default function SalesRegistration() {
   const [isEventSale, setIsEventSale] = useState(false)
@@ -173,7 +190,7 @@ export default function SalesRegistration() {
                       <SelectValue placeholder="Seleccionar producto" />
                     </SelectTrigger>
                     <SelectContent className="bg-gray-700 border-gray-600">
-                      {sampleProducts.map((product) => (
+                      {productOptions.map((product) => (
                         <SelectItem key={product} value={product} className="text-white hover:bg-gray-600">
                           {product}
                         </SelectItem>
