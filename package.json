@@ -8,7 +8,12 @@
     "start": "next start"
   },
   "dependencies": {
+    "@radix-ui/react-dialog": "^1.1.14",
+    "@radix-ui/react-label": "^2.1.7",
+    "@radix-ui/react-select": "^2.2.5",
     "@radix-ui/react-slot": "^1.2.3",
+    "@radix-ui/react-switch": "^1.2.5",
+    "autoprefixer": "^10.4.21",
     "chart.js": "^4.4.9",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -19,6 +24,7 @@
     "lucide": "^0.525.0",
     "lucide-react": "^0.525.0",
     "next": "^15.3.5",
+    "postcss": "^8.5.6",
     "react": "^19.0.0",
     "react-chartjs-2": "^5.3.0",
     "react-dom": "^19.0.0",
@@ -34,7 +40,7 @@
     "eslint": "^9",
     "eslint-config-next": "15.3.2",
     "firebase-tools": "^14.4.0",
-    "tailwindcss": "^4",
+    "tailwindcss": "^4.1.11",
     "typescript": "^5"
   }
 }
