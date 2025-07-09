@@ -134,18 +134,19 @@ export default function SalesRegistration() {
   })
 
   return (
-    <div className="min-h-screen bg-background p-6 text-foreground">
+    <div className="min-h-screen bg-gray-900 p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Sales Registration Form */}
         <Card className="shadow-sm">
-          <CardHeader className="bg-card border-b border-default">
-            <CardTitle className="text-2xl font-semibold text-foreground">Registrar Venta</CardTitle>
+          <CardHeader className="bg-gray-800 border-gray-700">
+            <CardTitle className="text-2xl font-semibold text-white">Registrar Venta</CardTitle>
           </CardHeader>
-          <CardContent className="p-6 bg-card">            <form onSubmit={handleSubmit} className="space-y-6">
+          <CardContent className="p-6 bg-gray-800">
+            <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {/* Date Picker */}
                 <div className="space-y-2">
-                  <Label htmlFor="fecha" className="text-sm font-medium text-foreground">
+                  <Label htmlFor="fecha" className="text-sm font-medium text-gray-200">
                     Fecha de la venta
                   </Label>
                   <div className="relative">
@@ -154,26 +155,26 @@ export default function SalesRegistration() {
                       type="date"
                       value={formData.fecha}
                       onChange={(e) => setFormData({ ...formData, fecha: e.target.value })}
-                      className="pl-10"
+                      className="pl-10 bg-gray-700 border-gray-600 text-white placeholder-gray-400"
                       required
                     />
-                    <CalendarIcon className="absolute left-3 top-3 h-4 w-4 text-gray-500" />
+                    <CalendarIcon className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                   </div>
                 </div>
 
                 {/* Product Select */}
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium text-foreground">Producto vendido</Label>
+                  <Label className="text-sm font-medium text-gray-200">Producto vendido</Label>
                   <Select
                     value={formData.producto}
-                    onValueChange={(value: any) => setFormData({ ...formData, producto: value })}
+                    onValueChange={(value) => setFormData({ ...formData, producto: value })}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="bg-gray-700 border-gray-600 text-white">
                       <SelectValue placeholder="Seleccionar producto" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="bg-gray-700 border-gray-600">
                       {sampleProducts.map((product) => (
-                        <SelectItem key={product} value={product}>
+                        <SelectItem key={product} value={product} className="text-white hover:bg-gray-600">
                           {product}
                         </SelectItem>
                       ))}
@@ -183,7 +184,7 @@ export default function SalesRegistration() {
 
                 {/* Quantity */}
                 <div className="space-y-2">
-                  <Label htmlFor="cantidad" className="text-sm font-medium text-foreground">
+                  <Label htmlFor="cantidad" className="text-sm font-medium text-gray-200">
                     Cantidad vendida
                   </Label>
                   <Input
@@ -194,12 +195,13 @@ export default function SalesRegistration() {
                     onChange={(e) => setFormData({ ...formData, cantidad: e.target.value })}
                     placeholder="0"
                     required
+                    className="bg-gray-700 border-gray-600 text-white placeholder-gray-400"
                   />
                 </div>
 
                 {/* Unit Price */}
                 <div className="space-y-2">
-                  <Label htmlFor="precio" className="text-sm font-medium text-foreground">
+                  <Label htmlFor="precio" className="text-sm font-medium text-gray-200">
                     Precio unitario de venta
                   </Label>
                   <Input
@@ -211,22 +213,23 @@ export default function SalesRegistration() {
                     onChange={(e) => setFormData({ ...formData, precioUnitario: e.target.value })}
                     placeholder="0.00"
                     required
+                    className="bg-gray-700 border-gray-600 text-white placeholder-gray-400"
                   />
                 </div>
 
                 {/* Payment Method */}
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium text-foreground">Método de pago</Label>
+                  <Label className="text-sm font-medium text-gray-200">Método de pago</Label>
                   <Select
                     value={formData.metodoPago}
-                    onValueChange={(value: any) => setFormData({ ...formData, metodoPago: value })}
+                    onValueChange={(value) => setFormData({ ...formData, metodoPago: value })}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="bg-gray-700 border-gray-600 text-white">
                       <SelectValue placeholder="Seleccionar método" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="bg-gray-700 border-gray-600">
                       {paymentMethods.map((method) => (
-                        <SelectItem key={method} value={method}>
+                        <SelectItem key={method} value={method} className="text-white hover:bg-gray-600">
                           {method}
                         </SelectItem>
                       ))}
@@ -236,8 +239,8 @@ export default function SalesRegistration() {
 
                 {/* Total Display */}
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium text-foreground">Total</Label>
-                  <div className="px-3 py-2 bg-gray-50 border rounded-md text-lg font-semibold text-green-600">
+                  <Label className="text-sm font-medium text-gray-200">Total</Label>
+                  <div className="px-3 py-2 bg-gray-700 border-gray-600 rounded-md text-lg font-semibold text-green-400">
                     $
                     {formData.cantidad && formData.precioUnitario
                       ? (Number.parseFloat(formData.cantidad) * Number.parseFloat(formData.precioUnitario)).toFixed(2)
@@ -250,26 +253,26 @@ export default function SalesRegistration() {
               <div className="border-t pt-6">
                 <div className="flex items-center space-x-3 mb-4">
                   <Switch id="event-sale" checked={isEventSale} onCheckedChange={setIsEventSale} />
-                  <Label htmlFor="event-sale" className="text-sm font-medium text-foreground">
+                  <Label htmlFor="event-sale" className="text-sm font-medium text-gray-200">
                     ¿Esta venta pertenece a un evento?
                   </Label>
                 </div>
 
                 {isEventSale && (
-                  <div className="bg-blue-50 p-4 rounded-lg space-y-4">
+                  <div className="bg-gray-700/50 p-4 rounded-lg space-y-4">
                     <div className="flex gap-4">
                       <div className="flex-1">
-                        <Label className="text-sm font-medium text-foreground">Seleccionar evento existente</Label>
+                        <Label className="text-sm font-medium text-gray-200">Seleccionar evento existente</Label>
                         <Select
                           value={formData.evento}
-                          onValueChange={(value: any) => setFormData({ ...formData, evento: value })}
+                          onValueChange={(value) => setFormData({ ...formData, evento: value })}
                         >
-                          <SelectTrigger>
+                          <SelectTrigger className="bg-gray-700 border-gray-600 text-white">
                             <SelectValue placeholder="Seleccionar evento" />
                           </SelectTrigger>
-                          <SelectContent>
+                          <SelectContent className="bg-gray-700 border-gray-600">
                             {sampleEvents.map((event) => (
-                              <SelectItem key={event} value={event}>
+                              <SelectItem key={event} value={event} className="text-white hover:bg-gray-600">
                                 {event}
                               </SelectItem>
                             ))}
@@ -279,64 +282,90 @@ export default function SalesRegistration() {
                       <div className="flex items-end">
                         <Dialog open={isNewEventModalOpen} onOpenChange={setIsNewEventModalOpen}>
                           <DialogTrigger asChild>
-                            <Button type="button" className="flex items-center gap-2 bg-transparent border border-input">
+                            <Button
+                              type="button"
+                              variant="outline"
+                              className="flex items-center gap-2 bg-transparent text-white hover:bg-gray-600"
+                            >
                               <Plus className="h-4 w-4" />
                               Crear nuevo evento
                             </Button>
                           </DialogTrigger>
-                          <DialogContent className="sm:max-w-md">
+                          <DialogContent className="sm:max-w-md bg-gray-800 text-white">
                             <DialogHeader>
                               <DialogTitle>Crear Nuevo Evento</DialogTitle>
                             </DialogHeader>
                             <form onSubmit={handleCreateEvent} className="space-y-4">
                               <div>
-                                <Label htmlFor="event-name">Nombre del evento</Label>
+                                <Label htmlFor="event-name" className="text-gray-200">
+                                  Nombre del evento
+                                </Label>
                                 <Input
                                   id="event-name"
                                   value={newEvent.name}
                                   onChange={(e) => setNewEvent({ ...newEvent, name: e.target.value })}
                                   placeholder="Nombre del evento"
                                   required
+                                  className="bg-gray-700 border-gray-600 text-white placeholder-gray-400"
                                 />
                               </div>
                               <div>
-                                <Label htmlFor="event-date">Fecha</Label>
+                                <Label htmlFor="event-date" className="text-gray-200">
+                                  Fecha
+                                </Label>
                                 <Input
                                   id="event-date"
                                   type="date"
                                   value={newEvent.date}
                                   onChange={(e) => setNewEvent({ ...newEvent, date: e.target.value })}
                                   required
+                                  className="bg-gray-700 border-gray-600 text-white placeholder-gray-400"
                                 />
                               </div>
                               <div>
-                                <Label htmlFor="event-location">Ubicación (opcional)</Label>
+                                <Label htmlFor="event-location" className="text-gray-200">
+                                  Ubicación (opcional)
+                                </Label>
                                 <Input
                                   id="event-location"
                                   value={newEvent.location}
                                   onChange={(e) => setNewEvent({ ...newEvent, location: e.target.value })}
                                   placeholder="Ubicación del evento"
+                                  className="bg-gray-700 border-gray-600 text-white placeholder-gray-400"
                                 />
                               </div>
                               <div>
-                                <Label>Tipo de evento</Label>
+                                <Label className="text-gray-200">Tipo de evento</Label>
                                 <Select
                                   value={newEvent.type}
-                                  onValueChange={(value: any) => setNewEvent({ ...newEvent, type: value })}
+                                  onValueChange={(value) => setNewEvent({ ...newEvent, type: value })}
                                 >
-                                  <SelectTrigger>
+                                  <SelectTrigger className="bg-gray-700 border-gray-600 text-white">
                                     <SelectValue placeholder="Seleccionar tipo" />
                                   </SelectTrigger>
-                                  <SelectContent>
-                                    <SelectItem value="feria">Feria</SelectItem>
-                                    <SelectItem value="exposicion">Exposición</SelectItem>
-                                    <SelectItem value="conferencia">Conferencia</SelectItem>
-                                    <SelectItem value="promocion">Promoción</SelectItem>
+                                  <SelectContent className="bg-gray-700 border-gray-600">
+                                    <SelectItem value="feria" className="text-white hover:bg-gray-600">
+                                      Feria
+                                    </SelectItem>
+                                    <SelectItem value="exposicion" className="text-white hover:bg-gray-600">
+                                      Exposición
+                                    </SelectItem>
+                                    <SelectItem value="conferencia" className="text-white hover:bg-gray-600">
+                                      Conferencia
+                                    </SelectItem>
+                                    <SelectItem value="promocion" className="text-white hover:bg-gray-600">
+                                      Promoción
+                                    </SelectItem>
                                   </SelectContent>
                                 </Select>
                               </div>
                               <div className="flex justify-end gap-2">
-                                <Button type="button" className="border border-input bg-transparent" onClick={() => setIsNewEventModalOpen(false)}>
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  onClick={() => setIsNewEventModalOpen(false)}
+                                  className="text-white hover:bg-gray-600"
+                                >
                                   Cancelar
                                 </Button>
                                 <Button type="submit">Crear Evento</Button>
@@ -351,7 +380,7 @@ export default function SalesRegistration() {
               </div>
 
               <div className="flex justify-end">
-                <Button type="submit" className="px-8 py-2 bg-blue-600 hover:bg-blue-700">
+                <Button type="submit" className="px-8 py-2 bg-blue-600 hover:bg-blue-700 text-white">
                   Registrar Venta
                 </Button>
               </div>
@@ -361,14 +390,15 @@ export default function SalesRegistration() {
 
         {/* Sales History */}
         <Card className="shadow-sm">
-          <CardHeader className="bg-card border-b border-default">
-            <CardTitle className="text-2xl font-semibold text-foreground">Ventas Registradas</CardTitle>
+          <CardHeader className="bg-gray-800 border-gray-700">
+            <CardTitle className="text-2xl font-semibold text-white">Ventas Registradas</CardTitle>
           </CardHeader>
-          <CardContent className="p-6 bg-card">            {/* Filters */}
-            <div className="mb-6 p-4 bg-card rounded-lg border border-default">
+          <CardContent className="p-6 bg-gray-800">
+            {/* Filters */}
+            <div className="mb-6 p-4 bg-gray-700 rounded-lg">
               <div className="flex items-center gap-2 mb-4">
-                <Filter className="h-4 w-4 text-gray-500" />
-                <span className="text-sm font-medium text-foreground">Filtros</span>
+                <Filter className="h-4 w-4 text-gray-300" />
+                <span className="text-sm font-medium text-gray-200">Filtros</span>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div>
@@ -377,7 +407,7 @@ export default function SalesRegistration() {
                     type="date"
                     value={filters.dateFrom}
                     onChange={(e) => setFilters({ ...filters, dateFrom: e.target.value })}
-                    className="mt-1"
+                    className="mt-1 bg-gray-700 border-gray-600 text-white placeholder-gray-400"
                   />
                 </div>
                 <div>
@@ -386,7 +416,7 @@ export default function SalesRegistration() {
                     type="date"
                     value={filters.dateTo}
                     onChange={(e) => setFilters({ ...filters, dateTo: e.target.value })}
-                    className="mt-1"
+                    className="mt-1 bg-gray-700 border-gray-600 text-white placeholder-gray-400"
                   />
                 </div>
                 <div>
@@ -395,22 +425,24 @@ export default function SalesRegistration() {
                     placeholder="Buscar producto..."
                     value={filters.product}
                     onChange={(e) => setFilters({ ...filters, product: e.target.value })}
-                    className="mt-1"
+                    className="mt-1 bg-gray-700 border-gray-600 text-white placeholder-gray-400"
                   />
                 </div>
                 <div>
                   <Label className="text-xs text-gray-300">Método de pago</Label>
                   <Select
                     value={filters.paymentMethod}
-                    onValueChange={(value: any) => setFilters({ ...filters, paymentMethod: value })}
+                    onValueChange={(value) => setFilters({ ...filters, paymentMethod: value })}
                   >
-                    <SelectTrigger className="mt-1">
+                    <SelectTrigger className="mt-1 bg-gray-700 border-gray-600 text-white">
                       <SelectValue placeholder="Todos" />
                     </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Todos</SelectItem>
+                    <SelectContent className="bg-gray-700 border-gray-600">
+                      <SelectItem value="all" className="text-white hover:bg-gray-600">
+                        Todos
+                      </SelectItem>
                       {paymentMethods.map((method) => (
-                        <SelectItem key={method} value={method}>
+                        <SelectItem key={method} value={method} className="text-white hover:bg-gray-600">
                           {method}
                         </SelectItem>
                       ))}
@@ -424,34 +456,34 @@ export default function SalesRegistration() {
             <div className="rounded-lg border">
               <Table>
                 <TableHeader>
-                  <TableRow className="bg-card">
-                    <TableHead className="font-semibold">Fecha</TableHead>
-                    <TableHead className="font-semibold">Producto</TableHead>
-                    <TableHead className="font-semibold">Cantidad</TableHead>
-                    <TableHead className="font-semibold">Total</TableHead>
-                    <TableHead className="font-semibold">Método de Pago</TableHead>
-                    <TableHead className="font-semibold">Evento</TableHead>
+                  <TableRow className="bg-gray-700">
+                    <TableHead className="font-semibold text-white">Fecha</TableHead>
+                    <TableHead className="font-semibold text-white">Producto</TableHead>
+                    <TableHead className="font-semibold text-white">Cantidad</TableHead>
+                    <TableHead className="font-semibold text-white">Total</TableHead>
+                    <TableHead className="font-semibold text-white">Método de Pago</TableHead>
+                    <TableHead className="font-semibold text-white">Evento</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {filteredSales.map((sale) => (
-                    <TableRow key={sale.id} className="hover:bg-gray-50">
-                      <TableCell className="font-medium">{sale.fecha}</TableCell>
-                      <TableCell>{sale.producto}</TableCell>
-                      <TableCell>{sale.cantidad}</TableCell>
-                      <TableCell className="font-semibold text-green-600">${sale.total.toFixed(2)}</TableCell>
+                    <TableRow key={sale.id} className="hover:bg-gray-700">
+                      <TableCell className="font-medium text-white">{sale.fecha}</TableCell>
+                      <TableCell className="text-white">{sale.producto}</TableCell>
+                      <TableCell className="text-white">{sale.cantidad}</TableCell>
+                      <TableCell className="font-semibold text-green-400">${sale.total.toFixed(2)}</TableCell>
                       <TableCell>
-                        <Badge className="text-xs">
+                        <Badge variant="outline" className="text-xs text-white border-gray-500">
                           {sale.metodoPago}
                         </Badge>
                       </TableCell>
                       <TableCell>
                         {sale.evento ? (
-                          <Badge className="text-xs">
+                          <Badge variant="secondary" className="text-xs text-white bg-gray-600 border-gray-500">
                             {sale.evento}
                           </Badge>
                         ) : (
-                          <span className="text-gray-500 text-sm">-</span>
+                          <span className="text-gray-400 text-sm">-</span>
                         )}
                       </TableCell>
                     </TableRow>
