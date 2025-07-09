@@ -83,7 +83,17 @@ export default function SalesRegistration() {
 
   const [isEventSale, setIsEventSale] = useState(false)
   const [isNewEventModalOpen, setIsNewEventModalOpen] = useState(false)
-  const [sales, setSales] = useState(sampleSales)
+  type Sale = {
+    id: number
+    fecha: string
+    producto: string
+    cantidad: number
+    precioUnitario: number
+    total: number
+    metodoPago: string
+    evento: string | null
+  }
+  const [sales, setSales] = useState<Sale[]>([])
   const [filters, setFilters] = useState({
     dateFrom: "",
     dateTo: "",
