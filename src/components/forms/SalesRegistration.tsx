@@ -64,21 +64,23 @@ const sampleEvents = ["Feria Tecnológica 2024", "Expo Gaming", "Black Friday Sa
 
 const paymentMethods = ["Efectivo", "QR", "Transferencia", "Tarjeta"]
 
-const { activeBusiness } = useUser()
-const [productOptions, setProductOptions] = useState<string[]>([])
-
-useEffect(() => {
-  const fetchProducts = async () => {
-    if (!activeBusiness?.id) return
-    const q = query(collection(db, "products"), where("businessId", "==", activeBusiness.id))
-    const snapshot = await getDocs(q)
-    const products = snapshot.docs.map(doc => doc.data()?.name).filter(Boolean) as string[]
-    setProductOptions(products)
-  }
-  fetchProducts()
-}, [activeBusiness])
 
 export default function SalesRegistration() {
+  const { activeBusiness } = useUser()
+  const [productOptions, setProductOptions] = useState<string[]>([])
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      if (!activeBusiness?.id) return
+      const q = query(collection(db, "products"), where("businessId", "==", activeBusiness.id))
+      const snapshot = await getDocs(q)
+      const products = snapshot.docs.map(doc => doc.data()?.name).filter(Boolean) as string[]
+      setProductOptions(products)
+    }
+    fetchProducts()
+  }, [activeBusiness])
+
+
   const [isEventSale, setIsEventSale] = useState(false)
   const [isNewEventModalOpen, setIsNewEventModalOpen] = useState(false)
   const [sales, setSales] = useState(sampleSales)
