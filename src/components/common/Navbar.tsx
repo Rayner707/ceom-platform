@@ -40,7 +40,12 @@ export default function Navbar() {
           <div className="p-2 flex flex-col space-y-2">
             {navItem("/dashboard", "Dashboard")}
             {userSections.map((section) => navItem(section.path, section.name))}
-            {role === "emprendedor" && navItem("/pricing", "Cálculo de Precio")}
+            {role === "emprendedor" && (
+              <>
+                {navItem("/sales", "Ventas")}
+                {navItem("/pricing", "Cálculo de Precio")}
+              </>
+            )}
             {role === "admin" && (
               <>
                 <hr className="my-2 border-gray-400" />

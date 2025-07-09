@@ -33,7 +33,10 @@ export default function Sidebar() {
         {userSections.map((section) => navItem(section.path, section.name))}
 
         {role === "emprendedor" && (
-          navItem("/pricing", "Cálculo de Precio")
+          <>
+            {navItem("/sales", "Ventas")}
+            {navItem("/pricing", "Cálculo de Precio")}
+          </>
         )}
 
         {role === "admin" && (
